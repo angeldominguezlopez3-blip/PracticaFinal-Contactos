@@ -4,11 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.card.MaterialCardView
 
 class MenuActivity : AppCompatActivity() {
 
-    private lateinit var btnRegistroContactos: Button
-    private lateinit var btnVerContactos: Button
+    private lateinit var cardRegistro: MaterialCardView
+    private lateinit var cardVerContactos: MaterialCardView
     private lateinit var btnCerrarSesion: Button
     private lateinit var usuario: String
 
@@ -18,17 +19,19 @@ class MenuActivity : AppCompatActivity() {
 
         usuario = intent.getStringExtra("usuario") ?: ""
 
-        btnRegistroContactos = findViewById(R.id.btnRegistroContactos)
-        btnVerContactos = findViewById(R.id.btnVerContactos)
+        // Inicializar vistas correctamente según el layout
+        cardRegistro = findViewById(R.id.cardRegistro)
+        cardVerContactos = findViewById(R.id.cardVerContactos)
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
 
-        btnRegistroContactos.setOnClickListener {
+        // Configurar click listeners para las cards
+        cardRegistro.setOnClickListener {
             val intent = Intent(this, RegistroContactoActivity::class.java)
             intent.putExtra("usuario", usuario)
             startActivity(intent)
         }
 
-        btnVerContactos.setOnClickListener {
+        cardVerContactos.setOnClickListener {
             val intent = Intent(this, VerContactosActivity::class.java)
             intent.putExtra("usuario", usuario)
             startActivity(intent)
@@ -37,8 +40,10 @@ class MenuActivity : AppCompatActivity() {
         btnCerrarSesion.setOnClickListener {
             // Limpiar sesión
             getSharedPreferences("user_session", MODE_PRIVATE).edit().clear().apply()
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
             finish()
-            startActivity(Intent(this, LoginActivity::class.java))
         }
     }
 }

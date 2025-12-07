@@ -109,7 +109,7 @@
                     android:textColor="@color/primary_color"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Campo Código -->
+                <!-- Campo Código (solo lectura) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilCodigo"
                     android:layout_width="match_parent"
@@ -118,39 +118,60 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     app:startIconDrawable="@drawable/ic_code"
                     app:boxStrokeColor="@color/primary_color"
-                    app:endIconMode="clear_text">
+                    app:helperText="Generado automáticamente">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etCodigo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Código (Para actualizar/eliminar)"
+                        android:hint="Código (Auto)"
                         android:inputType="number"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        android:enabled="false" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Campo Nombre -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilNombre"
+                <!-- Campo Nombre con botón de búsqueda -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@drawable/ic_person"
-                    app:boxStrokeColor="@color/primary_color"
-                    app:endIconMode="clear_text"
-                    app:helperText="* Obligatorio">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etNombre"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilNombre"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="Nombre"
-                        android:inputType="textPersonName"
-                        android:maxLines="1" />
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:startIconDrawable="@drawable/ic_person"
+                        app:boxStrokeColor="@color/primary_color"
+                        app:helperText="* Obligatorio">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etNombre"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Nombre"
+                            android:inputType="textPersonName"
+                            android:maxLines="1" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBuscar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Buscar"
+                        android:textSize="12sp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        android:minWidth="0dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp" />
+
+                </LinearLayout>
 
                 <!-- Campo Dirección -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -245,7 +266,7 @@
                     app:backgroundTint="@color/success_color"
                     app:icon="@drawable/ic_save"
                     app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.MaterialComponents.Button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnActualizar"
@@ -259,7 +280,7 @@
                     app:backgroundTint="@color/warning_color"
                     app:icon="@drawable/ic_update"
                     app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.MaterialComponents.Button" />
 
             </LinearLayout>
 
@@ -281,7 +302,7 @@
                     app:backgroundTint="@color/error_color"
                     app:icon="@drawable/ic_delete"
                     app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.MaterialComponents.Button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLimpiar"
@@ -295,7 +316,7 @@
                     app:backgroundTint="@color/secondary_color"
                     app:icon="@drawable/ic_clear"
                     app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                    style="@style/Widget.MaterialComponents.Button" />
 
             </LinearLayout>
 
@@ -305,11 +326,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="* Los campos Nombre y Teléfono son obligatorios"
+            android:text="* Para actualizar o eliminar, busque primero el contacto por nombre"
             android:textSize="12sp"
             android:textColor="@color/text_secondary"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:gravity="center" />
 
     </LinearLayout>
 

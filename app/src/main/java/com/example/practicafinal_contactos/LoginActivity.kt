@@ -3,33 +3,30 @@ package com.example.practicafinal_contactos
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.textfield.TextInputEditText
 import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var etUsuario: EditText
-    private lateinit var etPassword: EditText
+    private lateinit var etUsuario: TextInputEditText
+    private lateinit var etPassword: TextInputEditText
     private lateinit var btnLogin: Button
-    private lateinit var tvRegistrarse: TextView
-    private val url = "http://192.168.1.100/gestioncontactos/" // Cambia por tu IP
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Inicializar vistas
         etUsuario = findViewById(R.id.etUsuario)
         etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
-        tvRegistrarse = findViewById(R.id.tvRegistrarse)
 
+        // Configurar listener del botón login
         btnLogin.setOnClickListener {
             val usuario = etUsuario.text.toString().trim()
             val password = etPassword.text.toString().trim()
@@ -42,8 +39,10 @@ class LoginActivity : AppCompatActivity() {
             loginUsuario(usuario, password)
         }
 
-        tvRegistrarse.setOnClickListener {
-            startActivity(Intent(this, RegistroActivity::class.java))
+        // Configurar listener del TextView registrarse
+        findViewById<android.widget.TextView>(R.id.tvRegistrarse).setOnClickListener {
+            val intent = Intent(this@LoginActivity, RegistroActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -56,9 +55,9 @@ class LoginActivity : AppCompatActivity() {
 
         val request = JsonObjectRequest(
             Request.Method.POST,
-            "${url}login.php",
+            "${Config.URL}login.php",
             jsonObject,
-            Response.Listener { response ->
+            { response ->
                 if (response.getBoolean("success")) {
                     // Guardar usuario en SharedPreferences
                     val sharedPref = getSharedPreferences("user_session", MODE_PRIVATE)
@@ -68,16 +67,21 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     // Ir al menú principal
-                    val intent = Intent(this, MenuActivity::class.java)
+                    val intent = Intent(this@LoginActivity, MenuActivity::class.java)
                     intent.putExtra("usuario", usuario)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 } else {
                     Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
                 }
             },
-            Response.ErrorListener { error ->
-                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+            { error ->
+                Toast.makeText(
+                    this,
+                    "Error de conexión: ${error.message ?: "Desconocido"}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
         queue.add(request)

@@ -135,7 +135,10 @@
         android:textStyle="bold"
         android:padding="12dp"
         android:drawablePadding="8dp"
-        android:drawableStart="@drawable/ic_add_user" />
+        android:drawableStart="@drawable/ic_add_user"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
 
     <!-- Versión de la app -->
     <TextView

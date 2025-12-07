@@ -1,11 +1,8 @@
 package com.example.practicafinal_contactos
 
-import android.graphics.BitmapFactory
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
@@ -32,17 +29,15 @@ class ContactoAdapter(private val contactos: List<Contacto>) :
 
         holder.tvNombre.text = contacto.nombre
         holder.tvTelefono.text = contacto.telefono
-        holder.tvCorreo.text = contacto.correo
+        holder.tvCorreo.text = if (contacto.correo.isNotEmpty()) contacto.correo else "Sin correo"
 
-        // Cargar imagen
+        // Cargar imagen desde URL usando Picasso
         if (contacto.imagen.isNotEmpty()) {
-            try {
-                val decodedString = Base64.decode(contacto.imagen, Base64.DEFAULT)
-                val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                holder.ivFoto.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                holder.ivFoto.setImageResource(R.drawable.ic_default_contact)
-            }
+            Picasso.get()
+                .load(contacto.imagen)
+                .placeholder(R.drawable.ic_default_contact)
+                .error(R.drawable.ic_default_contact)
+                .into(holder.ivFoto)
         } else {
             holder.ivFoto.setImageResource(R.drawable.ic_default_contact)
         }

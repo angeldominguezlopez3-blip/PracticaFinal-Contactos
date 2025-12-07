@@ -6,6 +6,6 @@ data class Contacto(
     val direccion: String,
     val telefono: String,
     val correo: String,
-    val imagen: String,
+    val imagen: String, // Ahora almacena la URL completa de ImgBB
     val usuario: String
 )

@@ -1,33 +1,35 @@
 package com.example.practicafinal_contactos
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputEditText
 import org.json.JSONObject
 
 class RegistroActivity : AppCompatActivity() {
 
-    private lateinit var etUsuario: EditText
-    private lateinit var etPassword: EditText
-    private lateinit var etConfirmPassword: EditText
-    private lateinit var btnRegistrar: Button
-    private val url = "http://192.168.1.100/gestioncontactos/"
+    private lateinit var etUsuario: TextInputEditText
+    private lateinit var etPassword: TextInputEditText
+    private lateinit var etConfirmPassword: TextInputEditText
+    private lateinit var btnRegistrar: MaterialButton
+    private lateinit var btnVolverLogin: MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
 
+        // Inicializar vistas
         etUsuario = findViewById(R.id.etUsuario)
         etPassword = findViewById(R.id.etPassword)
         etConfirmPassword = findViewById(R.id.etConfirmPassword)
         btnRegistrar = findViewById(R.id.btnRegistrar)
+        btnVolverLogin = findViewById(R.id.btnVolverLogin)
 
+        // Configurar listener del botón registrar
         btnRegistrar.setOnClickListener {
             val usuario = etUsuario.text.toString().trim()
             val password = etPassword.text.toString().trim()
@@ -43,7 +45,17 @@ class RegistroActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (password.length < 6) {
+                Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             registrarUsuario(usuario, password)
+        }
+
+        // Configurar listener del botón volver
+        btnVolverLogin.setOnClickListener {
+            finish()
         }
     }
 
@@ -56,18 +68,30 @@ class RegistroActivity : AppCompatActivity() {
 
         val request = JsonObjectRequest(
             Request.Method.POST,
-            "${url}registrar_usuario.php",
+            "${Config.URL}registrar_usuario.php",
             jsonObject,
-            Response.Listener { response ->
+            { response ->
                 if (response.getBoolean("success")) {
-                    Toast.makeText(this, "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Usuario registrado exitosamente",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     finish()
                 } else {
-                    Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        response.getString("message"),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             },
-            Response.ErrorListener { error ->
-                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+            { error ->
+                Toast.makeText(
+                    this,
+                    "Error: ${error.message ?: "Desconocido"}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         )
 
