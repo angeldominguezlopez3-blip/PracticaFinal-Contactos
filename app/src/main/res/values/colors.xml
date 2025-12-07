@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores principales -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Colores personalizados para la app -->
+    <color name="primary_color">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="primary_light">#BBDEFB</color>
+    <color name="secondary_color">#FF9800</color>
+    <color name="secondary_dark">#F57C00</color>
+    <color name="accent_color">#FF4081</color>
+
+    <!-- Colores de fondo -->
+    <color name="background_color">#F5F5F5</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Colores de texto -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
+    <!-- Colores de estado -->
+    <color name="success_color">#4CAF50</color>
+    <color name="success_dark">#388E3C</color>
+    <color name="error_color">#F44336</color>
+    <color name="error_dark">#D32F2F</color>
+    <color name="warning_color">#FFC107</color>
+    <color name="warning_dark">#FFA000</color>
+    <color name="info_color">#2196F3</color>
+
+    <!-- Colores para íconos -->
+    <color name="icon_color">#757575</color>
+    <color name="icon_active">#2196F3</color>
+
+    <!-- Color para fondo del ícono de la app -->
+    <color name="ic_launcher_background">#2196F3</color>
+
+    <!-- Bordes y separadores -->
+    <color name="divider_color">#E0E0E0</color>
+    <color name="border_color">#BDBDBD</color>
+
+    <!-- Sombras -->
+    <color name="shadow_color">#1F000000</color>
+</resources>

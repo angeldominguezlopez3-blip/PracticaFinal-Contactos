@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Gestión de Contactos</string>
+    <string name="app_logo">Logo de la aplicación</string>
+    <string name="register_icon">Icono de registro</string>
+    <string name="user_profile">Perfil de usuario</string>
+    <string name="add_contact">Agregar contacto</string>
+    <string name="view_contacts">Ver contactos</string>
+    <string name="contact_photo">Foto del contacto</string>
+    <string name="empty_contacts">No hay contactos</string>
+    <string name="more_options">Más opciones</string>
+</resources>
