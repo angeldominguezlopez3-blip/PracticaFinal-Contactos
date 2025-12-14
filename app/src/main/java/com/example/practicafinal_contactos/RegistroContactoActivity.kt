@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -246,44 +247,91 @@ class RegistroContactoActivity : AppCompatActivity() {
             put("usuario", usuario)
         }
 
+        // Para DEBUG: Mostrar lo que se está enviando
+        Log.d("BuscarContacto", "Buscando: $nombre para usuario: $usuario")
+        Log.d("BuscarContacto", "JSON enviado: ${jsonObject.toString()}")
+
         val request = JsonObjectRequest(
             Request.Method.POST,
             "${Config.URL}buscar_contacto.php",
             jsonObject,
             { response ->
                 progressDialog.dismiss()
-                if (response.getBoolean("success")) {
-                    val contacto = response.getJSONObject("contacto")
 
-                    // Llenar los campos con los datos del contacto
-                    etCodigo.setText(contacto.getInt("codigo").toString())
-                    etNombre.setText(contacto.getString("nombre"))
-                    etDireccion.setText(contacto.optString("direccion", ""))
-                    etTelefono.setText(contacto.getString("telefono"))
-                    etCorreo.setText(contacto.optString("correo", ""))
+                // DEBUG: Mostrar respuesta completa
+                Log.d("BuscarContacto", "Respuesta recibida: $response")
 
-                    // Cargar la imagen si existe
-                    imagenUrl = contacto.optString("imagen", "")
-                    if (imagenUrl.isNotEmpty()) {
-                        Picasso.get()
-                            .load(imagenUrl)
-                            .placeholder(R.drawable.ic_default_contact)
-                            .error(R.drawable.ic_default_contact)
-                            .into(ivFoto)
+                try {
+                    val success = response.getBoolean("success")
+
+                    if (success) {
+                        val contacto = response.getJSONObject("contacto")
+
+                        // DEBUG: Mostrar datos del contacto
+                        Log.d("BuscarContacto", "Contacto encontrado: ${contacto.toString()}")
+
+                        // Llenar los campos con los datos del contacto
+                        val id = contacto.optString("id", "")
+                        val codigo = contacto.optString("codigo", "")
+
+                        // Usar id si codigo está vacío, o viceversa
+                        val codigoMostrar = if (codigo.isNotEmpty()) codigo else id
+                        etCodigo.setText(codigoMostrar)
+
+                        etNombre.setText(contacto.optString("nombre", ""))
+                        etDireccion.setText(contacto.optString("direccion", ""))
+                        etTelefono.setText(contacto.optString("telefono", ""))
+                        etCorreo.setText(contacto.optString("correo", ""))
+
+                        // Cargar la imagen si existe
+                        imagenUrl = contacto.optString("imagen", "")
+                        if (imagenUrl.isNotEmpty() && imagenUrl != "null") {
+                            Picasso.get()
+                                .load(imagenUrl)
+                                .placeholder(R.drawable.ic_default_contact)
+                                .error(R.drawable.ic_default_contact)
+                                .into(ivFoto, object : com.squareup.picasso.Callback {
+                                    override fun onSuccess() {
+                                        Log.d("BuscarContacto", "Imagen cargada exitosamente")
+                                    }
+                                    override fun onError(e: Exception?) {
+                                        Log.e("BuscarContacto", "Error al cargar imagen: ${e?.message}")
+                                        ivFoto.setImageResource(R.drawable.ic_default_contact)
+                                    }
+                                })
+                        } else {
+                            ivFoto.setImageResource(R.drawable.ic_default_contact)
+                            Log.d("BuscarContacto", "No hay imagen para este contacto")
+                        }
+
+                        Toast.makeText(this, "Contacto encontrado", Toast.LENGTH_SHORT).show()
+
                     } else {
-                        ivFoto.setImageResource(R.drawable.ic_default_contact)
-                    }
+                        val mensaje = response.optString("message", "Contacto no encontrado")
+                        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+                        Log.d("BuscarContacto", "No se encontró contacto: $mensaje")
 
-                    Toast.makeText(this, "Contacto encontrado", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Contacto no encontrado", Toast.LENGTH_SHORT).show()
+                        // Limpiar campos si no se encontró
+                        etCodigo.text.clear()
+                        etDireccion.text.clear()
+                        etTelefono.text.clear()
+                        etCorreo.text.clear()
+                        ivFoto.setImageResource(R.drawable.ic_default_contact)
+                        imagenUrl = ""
+                    }
+                } catch (e: Exception) {
+                    Log.e("BuscarContacto", "Error al procesar respuesta: ${e.message}")
+                    Toast.makeText(this, "Error al procesar respuesta del servidor", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
                 progressDialog.dismiss()
-                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                Log.e("BuscarContacto", "Error Volley: ${error.message}")
+                Toast.makeText(this, "Error de conexión: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         )
+
+
 
         queue.add(request)
     }

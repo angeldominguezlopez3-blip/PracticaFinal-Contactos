@@ -1,7 +1,7 @@
 package com.example.practicafinal_contactos
 
 data class Contacto(
-    val codigo: Int,
+    val codigo: String,
     val nombre: String,
     val direccion: String,
     val telefono: String,

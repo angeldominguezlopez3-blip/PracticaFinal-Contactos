@@ -2,6 +2,7 @@ package com.example.practicafinal_contactos
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -30,12 +31,20 @@ class VerContactosActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var usuario: String
     private val contactosList = mutableListOf<Contacto>()
+    private val TAG = "VerContactosDebug" // Para logs
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ver_contactos)
 
-        usuario = intent.getStringExtra("usuario") ?: ""
+        // Obtener usuario con valor por defecto
+        usuario = intent.getStringExtra("usuario") ?: run {
+            // Intentar obtener de SharedPreferences
+            val sharedPref = getSharedPreferences("user_session", MODE_PRIVATE)
+            sharedPref.getString("usuario", "") ?: ""
+        }
+
+        Log.d(TAG, "Usuario obtenido: $usuario")
 
         // Inicializar vistas
         recyclerView = findViewById(R.id.recyclerView)
@@ -83,50 +92,78 @@ class VerContactosActivity : AppCompatActivity() {
             put("usuario", usuario)
         }
 
+        val url = "${Config.URL}obtener_contactos.php"
+        Log.d(TAG, "URL: $url")
+        Log.d(TAG, "Enviando usuario: $usuario")
+
         val request = JsonObjectRequest(
-            Request.Method.POST,
-            "${Config.URL}obtener_contactos.php",
-            jsonObject,
+            Request.Method.POST, url, jsonObject,
             Response.Listener { response ->
                 progressBar.visibility = View.GONE
+                Log.d(TAG, "Respuesta recibida: ${response.toString()}")
 
-                if (response.getBoolean("success")) {
-                    contactosList.clear()
-                    val jsonArray: JSONArray = response.getJSONArray("contactos")
+                try {
+                    if (response.getBoolean("success")) {
+                        contactosList.clear()
+                        val jsonArray: JSONArray = response.getJSONArray("contactos")
+                        Log.d(TAG, "Número de contactos: ${jsonArray.length()}")
 
-                    for (i in 0 until jsonArray.length()) {
-                        val contactoJson = jsonArray.getJSONObject(i)
-                        val contacto = Contacto(
-                            codigo = contactoJson.getInt("codigo"),
-                            nombre = contactoJson.getString("nombre"),
-                            direccion = contactoJson.optString("direccion", ""),
-                            telefono = contactoJson.getString("telefono"),
-                            correo = contactoJson.optString("correo", ""),
-                            imagen = contactoJson.optString("imagen", ""),
-                            usuario = contactoJson.getString("usuario")
-                        )
-                        contactosList.add(contacto)
-                    }
+                        for (i in 0 until jsonArray.length()) {
+                            val contactoJson = jsonArray.getJSONObject(i)
+                            Log.d(TAG, "Procesando contacto $i: ${contactoJson.toString()}")
 
-                    adapter.notifyDataSetChanged()
+                            val contacto = Contacto(
+                                codigo = contactoJson.getString("codigo"),
+                                nombre = contactoJson.getString("nombre"),
+                                direccion = contactoJson.optString("direccion", ""),
+                                telefono = contactoJson.getString("telefono"),
+                                correo = contactoJson.optString("correo", ""),
+                                imagen = contactoJson.optString("imagen", ""),
+                                usuario = contactoJson.optString("usuario", usuario)
+                            )
+                            contactosList.add(contacto)
+                        }
 
-                    if (contactosList.isEmpty()) {
+                        adapter.notifyDataSetChanged()
+
+                        if (contactosList.isEmpty()) {
+                            emptyView.visibility = View.VISIBLE
+                            recyclerView.visibility = View.GONE
+                            Toast.makeText(this, "No hay contactos", Toast.LENGTH_SHORT).show()
+                        } else {
+                            recyclerView.visibility = View.VISIBLE
+                            emptyView.visibility = View.GONE
+                            Toast.makeText(this, "${contactosList.size} contactos cargados", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
                         emptyView.visibility = View.VISIBLE
                         recyclerView.visibility = View.GONE
-                    } else {
-                        recyclerView.visibility = View.VISIBLE
-                        emptyView.visibility = View.GONE
+                        val errorMsg = response.optString("message", "Error desconocido")
+                        Toast.makeText(this, "Error: $errorMsg", Toast.LENGTH_SHORT).show()
+                        Log.e(TAG, "Error del servidor: $errorMsg")
                     }
-                } else {
+                } catch (e: Exception) {
                     emptyView.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
+                    Toast.makeText(this, "Error al procesar datos: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e(TAG, "Excepción: ${e.message}")
+                    e.printStackTrace()
                 }
             },
             Response.ErrorListener { error ->
                 progressBar.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
                 recyclerView.visibility = View.GONE
-                Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+
+                val errorMsg = error.message ?: "Error de conexión"
+                Toast.makeText(this, "Error de red: $errorMsg", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Error Volley: $errorMsg")
+
+                // Mostrar detalles adicionales del error
+                error.networkResponse?.let {
+                    Log.e(TAG, "Código HTTP: ${it.statusCode}")
+                    Log.e(TAG, "Datos: ${String(it.data)}")
+                }
             }
         )
 
